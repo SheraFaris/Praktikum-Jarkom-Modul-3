@@ -120,3 +120,131 @@ iface eth0 inet static
 	netmask 255.255.255.0
 	gateway 192.168.5.1
 	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+
+
+[
+2. Buatlah konfigurasi untuk domain 
+lune33.com → ke IP node Lune , 
+sciel33.com → ke IP node Sciel ,
+gustave33.com → ke IP node Gustave 
+pada DNS Master Renoir. 
+Kemudian konfigurasikan node Verso sebagai DNS Slave 
+yang bekerja untuk DNS Master Renoir.
+]
+
+[Renoir]
+apt-get update
+apt-get install bind9 -y
+
+nano /etc/bind/named.conf.local
+
+zone "lune33.com" {
+	type master;
+    notify yes;
+    also-notify { 192.168.3.3; }; 
+    allow-transfer { 192.168.3.3; }; 
+	file "/etc/bind/jarkom/lune33.com";
+};
+
+zone "sciel33.com" {
+	type master;
+    notify yes;
+    also-notify { 192.168.3.3; }; 
+    allow-transfer { 192.168.3.3; }; 
+	file "/etc/bind/jarkom/sciel33.com";
+};
+
+zone "gustave33.com" {
+	type master;
+    notify yes;
+    also-notify { 192.168.3.3; }; 
+    allow-transfer { 192.168.3.3; }; 
+	file "/etc/bind/jarkom/gustave33.com";
+};
+
+nano /etc/bind/jarkom/lune33.com
+$TTL    604800
+@       IN      SOA     lune33.com. root.lune33.com. (
+                	    2026010201 ; Serial
+                        604800     ; Refresh
+                        86400      ; Retry
+                        2419200    ; Expire
+                        604800 )   ; Negative Cache TTL
+
+; ===== Name Server =====
+@       IN      NS      lune33.com.
+
+; ===== A Record (IPv4) =====
+@       IN      A       192.168.2.2     ; 
+
+; ===== AAAA Record (IPv6 - opsional) =====
+@       IN      AAAA    ::1
+
+
+nano /etc/bind/jarkom/sciel33.com
+$TTL    604800
+@       IN      SOA     sciel33.com. root.sciel33.com. (
+                        2026010201 ; Serial
+                        604800     ; Refresh
+                        86400      ; Retry
+                        2419200    ; Expire
+                        604800 )   ; Negative Cache TTL
+
+; ===== Name Server =====
+@       IN      NS      sciel33.com.
+
+; ===== A Record (IPv4) =====
+@       IN      A       192.168.2.3     ; 
+
+; ===== AAAA Record (IPv6 - opsional) =====
+@       IN      AAAA    ::1
+
+
+nano /etc/bind/jarkom/gustave33.com
+$TTL    604800
+@       IN      SOA     gustave33.com. root.gustave33.com. (
+                        2026010201 ; Serial
+                        604800     ; Refresh
+                        86400      ; Retry
+                        2419200    ; Expire
+                        604800 )   ; Negative Cache TTL
+
+; ===== Name Server =====
+@       IN      NS      gustave33.com.
+
+; ===== A Record (IPv4) =====
+@       IN      A       192.168.2.4     ; 
+
+; ===== AAAA Record (IPv6 - opsional) =====
+@       IN      AAAA    ::1
+
+service bind9 restart
+or???
+named -g
+
+
+[Verso]
+
+apt-get update
+apt-get install bind9 -y
+
+nano /etc/bind/named.conf.local
+
+zone "lune33.com" {
+	type slave;
+    masters { 192.168.3.2; }; 
+	file "/etc/bind/jarkom/lune33.com";
+};
+
+zone "sciel33.com" {
+	type slave;
+    masters { 192.168.3.2; }; 
+	file "/etc/bind/jarkom/sciel33.com";
+};
+
+zone "gustave33.com" {
+	type slave;
+    masters { 192.168.3.2; }; 
+	file "/etc/bind/jarkom/gustave33.com";
+};

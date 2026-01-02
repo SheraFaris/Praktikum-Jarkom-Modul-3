@@ -1,0 +1,122 @@
+[1.Setup Topo]
+
+[Aline1]
+# Static config for eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.2.1
+	netmask 255.255.255.0
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+# Static config for eth1
+auto eth1
+iface eth1 inet static
+	address 192.168.3.1
+	netmask 255.255.255.0
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+# Static config for eth2
+auto eth2
+iface eth2 inet static
+	address 192.168.4.1
+	netmask 255.255.255.0
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+# Static config for eth3
+auto eth3
+iface eth3 inet static
+	address 192.168.5.1
+	netmask 255.255.255.0
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+[Subnet 192.168.2.0/24]
+
+[Lune]
+# Static config for eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.2.2
+	netmask 255.255.255.0
+	gateway 192.168.2.1
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+[Sciel]
+# Static config for eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.2.3
+	netmask 255.255.255.0
+	gateway 192.168.2.1
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+[Gustave]
+# Static config for eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.2.4
+	netmask 255.255.255.0
+	gateway 192.168.2.1
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+
+[Subnet 192.168.3.0/24]
+
+[Renoir]
+# Static config for eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.3.2
+	netmask 255.255.255.0
+	gateway 192.168.3.1
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+[Verso]
+# Static config for eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.3.3
+	netmask 255.255.255.0
+	gateway 192.168.3.1
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+
+[Subnet 192.168.4.0/24]
+
+[Alicia2]
+# Static config for eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.4.2
+	netmask 255.255.255.0
+	gateway 192.168.4.1
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+
+[Subnet 192.168.5.0/24]
+
+[Esquie]
+# Static config for eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.5.2
+	netmask 255.255.255.0
+	gateway 192.168.5.1
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+[Monocco]
+# Static config for eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.5.3
+	netmask 255.255.255.0
+	gateway 192.168.5.1
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+[Maelle]
+# Static config for eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.5.4
+	netmask 255.255.255.0
+	gateway 192.168.5.1
+	up echo nameserver 192.168.122.1 > /etc/resolv.conf

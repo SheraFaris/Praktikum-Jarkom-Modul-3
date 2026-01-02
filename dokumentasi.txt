@@ -163,65 +163,136 @@ zone "gustave33.com" {
 	file "/etc/bind/jarkom/gustave33.com";
 };
 
+
+#3. Reverse DNS Lookup
+zone "2.168.192.in-addr.arpa" {
+    type master;
+    notify yes;
+    also-notify { 192.168.3.3; }; 
+    allow-transfer { 192.168.3.3; }; 
+    file "/etc/bind/jarkom/2.168.192.in-addr.arpa";
+};
+
+
+zone "expedition.gustave33.com" {
+    type master;
+    file "/etc/bind/jarkom/expedition.gustave33.com";
+};
+
+
 nano /etc/bind/jarkom/lune33.com
 $TTL    604800
 @       IN      SOA     lune33.com. root.lune33.com. (
-                	    2026010201 ; Serial
+                	    2026010202 ; Serial
                         604800     ; Refresh
                         86400      ; Retry
                         2419200    ; Expire
                         604800 )   ; Negative Cache TTL
 
 ; ===== Name Server =====
-@       IN      NS      lune33.com.
+@       IN      NS      ns.lune33.com.
 
-; ===== A Record (IPv4) =====
-@       IN      A       192.168.2.2     ; 
+; Glue record untuk nameserver
+ns      IN      A       192.168.3.2
 
-; ===== AAAA Record (IPv6 - opsional) =====
-@       IN      AAAA    ::1
+; ===== A Record domain utama =====
+@       IN      A       192.168.2.2
+
+; ===== Subdomain alias (CNAME) =====
+exp     IN  	CNAME  	lune33.com.
+
 
 
 nano /etc/bind/jarkom/sciel33.com
 $TTL    604800
 @       IN      SOA     sciel33.com. root.sciel33.com. (
-                        2026010201 ; Serial
+                        2026010203 ; Serial
                         604800     ; Refresh
                         86400      ; Retry
                         2419200    ; Expire
                         604800 )   ; Negative Cache TTL
 
 ; ===== Name Server =====
-@       IN      NS      sciel33.com.
+@       IN      NS      ns.sciel33.com.
 
-; ===== A Record (IPv4) =====
-@       IN      A       192.168.2.3     ; 
+; Glue record untuk nameserver
+ns      IN      A       192.168.3.2
 
-; ===== AAAA Record (IPv6 - opsional) =====
-@       IN      AAAA    ::1
+; ===== A Record domain utama =====
+@       IN      A       192.168.2.3
+
+; ===== Subdomain alias (CNAME) =====
+exp     IN      CNAME   sciel33.com.
+
+
 
 
 nano /etc/bind/jarkom/gustave33.com
 $TTL    604800
 @       IN      SOA     gustave33.com. root.gustave33.com. (
-                        2026010201 ; Serial
+                        2026010203 ; Serial
                         604800     ; Refresh
                         86400      ; Retry
                         2419200    ; Expire
                         604800 )   ; Negative Cache TTL
 
 ; ===== Name Server =====
-@       IN      NS      gustave33.com.
+@ 		IN 		NS		ns.gustave33.com.
 
-; ===== A Record (IPv4) =====
-@       IN      A       192.168.2.4     ; 
+; Glue record untuk nameserver
+ns      IN      A       192.168.3.2    
 
-; ===== AAAA Record (IPv6 - opsional) =====
-@       IN      AAAA    ::1
+; ===== Delegasi subdomain expedition =====
+expedition      IN      NS      ns.expedition.gustave33.com.
+
+; Glue record (karena ns masih satu domain)
+ns.expedition   IN      A       192.168.3.2
+
+; ===== Subdomain alias (CNAME) =====
+@ 		IN 		A 		192.168.2.4
+
+
+nano /etc/bind/jarkom/2.168.192.in-addr.arpa
+$TTL    604800
+@       IN      SOA     gustave33.com. root.gustave33.com. (
+                        2026010202 ; Serial
+                        604800     ; Refresh
+                        86400      ; Retry
+                        2419200    ; Expire
+                        604800 )   ; Negative Cache TTL
+
+; ===== Name Server =====
+@       IN      NS      ns.gustave33.com.
+
+; ===== PTR Record (Reverse DNS) =====
+4       IN      PTR     gustave33.com.    
+
+nano /etc/bind/jarkom/expedition.gustave33.com
+$TTL    604800
+@       IN      SOA     ns.expedition.gustave33.com. root.expedition.gustave33.com. (
+                        2026010201 ; Serial
+                        604800
+                        86400
+                        2419200
+                        604800 )
+
+; ===== Name Server =====
+@       IN      NS      ns.expedition.gustave33.com.
+
+; DNS Verso
+ns      IN      A       192.168.3.2
+
+; ===== A Record tujuan =====
+@       IN      A       192.168.2.4
+
+
 
 service bind9 restart
 or???
 named -g
+or ???
+named-checkzone 2.168.192.in-addr.arpa /etc/bind/jarkom/2.168.192.in-addr.arpa
+service bind9 restart
 
 
 [Verso]

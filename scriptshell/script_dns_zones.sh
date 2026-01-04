@@ -80,6 +80,20 @@ $TTL    604800
 4       IN      PTR     gustave33.com.
 EOF
 
+echo "[6/7] Tulis /etc/bind/expeditioners.com"
+cat > /etc/bind/jarkom/expeditioners.com <<'EOF'
+$TTL    604800
+@       IN      SOA     ns.expeditioners.com. root.expeditioners.com. (
+                        2         ; Serial
+                        604800    ; Refresh
+                        86400     ; Retry
+                        2419200   ; Expire
+                        604800 )  ; Negative Cache TTL
+;
+@       IN      NS      ns.expeditioners.com.
+ns      IN      A       192.168.3.2
+@       IN      A       192.168.4.2
+EOF
 
 echo "[7/7] Restart bind9"
 service named restart
@@ -87,6 +101,7 @@ service named restart
 echo "✅ Semua file zone DNS berhasil dibuat dan bind9 direstart."
 
 # ----------------------------------------------------------------------
+# nano /root/script_dns_zones.sh
 # chmod +x /root/script_dns_zones.sh
 # ls -l /root/script_dns_zones.sh
 # ./root/script_dns_zones.sh

@@ -30,6 +30,12 @@ zone "gustave33.com" {
     file "/etc/bind/jarkom/gustave33.com";
 };
 
+zone "expeditioners.com" {
+    type slave;
+    masters { 192.168.3.2; };
+    file "/etc/bind/jarkom/expeditioners.com";
+};
+
 # Reverse DNS (SLAVE)
 zone "2.168.192.in-addr.arpa" {
     type slave;
@@ -68,6 +74,7 @@ echo "[5] Selesai"
 echo " ^|^e DNS Slave (Verso) berhasil dikonfigurasi."
 
 # ----------------------------------------------------------------------
+# nano /root/script_dns_slave.sh
 # chmod +x /root/script_dns_slave.sh
 # ls -l /root/script_dns_slave.sh
 # ./root/script_dns_slave.sh

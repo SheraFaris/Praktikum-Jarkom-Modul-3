@@ -42,6 +42,14 @@ zone "gustave33.com" {
     file "/etc/bind/jarkom/gustave33.com";
 };
 
+zone "expeditioners.com" {
+    type master;
+    notify yes;
+    also-notify { 192.168.3.3; };
+    allow-transfer { 192.168.3.3; };
+    file "/etc/bind/db.expeditioners.com";
+};
+
 # Reverse DNS Lookup
 zone "2.168.192.in-addr.arpa" {
     type master;
@@ -61,6 +69,7 @@ service named status
 echo "✅ DNS Master configuration selesai."
 
 # ----------------------------------------------------------------------
+# nano /root/script_dns_master.sh
 # chmod +x /root/script_dns_master.sh
 # ls -l /root/script_dns_master.sh
 # ./root/script_dns_master.sh

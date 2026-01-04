@@ -38,7 +38,8 @@ iface eth0 inet static
 	address 192.168.2.2
 	netmask 255.255.255.0
 	gateway 192.168.2.1
-	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+	up echo nameserver 192.168.3.2 > /etc/resolv.conf
+	up echo nameserver 192.168.3.3 >> /etc/resolv.conf
 
 [Sciel]
 # Static config for eth0
@@ -47,7 +48,8 @@ iface eth0 inet static
 	address 192.168.2.3
 	netmask 255.255.255.0
 	gateway 192.168.2.1
-	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+	up echo nameserver 192.168.3.2 > /etc/resolv.conf
+	up echo nameserver 192.168.3.3 >> /etc/resolv.conf
 
 [Gustave]
 # Static config for eth0
@@ -56,8 +58,8 @@ iface eth0 inet static
 	address 192.168.2.4
 	netmask 255.255.255.0
 	gateway 192.168.2.1
-	up echo nameserver 192.168.122.1 > /etc/resolv.conf
-
+	up echo nameserver 192.168.3.2 > /etc/resolv.conf
+	up echo nameserver 192.168.3.3 >> /etc/resolv.conf
 
 [Subnet 192.168.3.0/24]
 
@@ -68,7 +70,7 @@ iface eth0 inet static
 	address 192.168.3.2
 	netmask 255.255.255.0
 	gateway 192.168.3.1
-	up echo nameserver 192.168.122.1 > /etc/resolv.conf
+	up echo nameserver 192.168.3.2 > /etc/resolv.conf
 
 [Verso]
 # Static config for eth0
@@ -173,16 +175,9 @@ zone "2.168.192.in-addr.arpa" {
     file "/etc/bind/jarkom/2.168.192.in-addr.arpa";
 };
 
-
-zone "expedition.gustave33.com" {
-    type master;
-    file "/etc/bind/jarkom/expedition.gustave33.com";
-};
-
-
 nano /etc/bind/jarkom/lune33.com
 $TTL    604800
-@       IN      SOA     lune33.com. root.lune33.com. (
+@       IN      SOA     ns.lune33.com. root.lune33.com. (
                 	    2026010202 ; Serial
                         604800     ; Refresh
                         86400      ; Retry
@@ -205,7 +200,7 @@ exp     IN  	CNAME  	lune33.com.
 
 nano /etc/bind/jarkom/sciel33.com
 $TTL    604800
-@       IN      SOA     sciel33.com. root.sciel33.com. (
+@       IN      SOA     ns.sciel33.com. root.sciel33.com. (
                         2026010203 ; Serial
                         604800     ; Refresh
                         86400      ; Retry
@@ -229,8 +224,8 @@ exp     IN      CNAME   sciel33.com.
 
 nano /etc/bind/jarkom/gustave33.com
 $TTL    604800
-@       IN      SOA     gustave33.com. root.gustave33.com. (
-                        2026010203 ; Serial
+@       IN      SOA     ms.gustave33.com. root.gustave33.com. (
+                        2026010204 ; Serial
                         604800     ; Refresh
                         86400      ; Retry
                         2419200    ; Expire
@@ -242,14 +237,15 @@ $TTL    604800
 ; Glue record untuk nameserver
 ns      IN      A       192.168.3.2    
 
+; ===== Subdomain alias (CNAME) =====
+@ 		IN 		A 		192.168.2.4
+
 ; ===== Delegasi subdomain expedition =====
 expedition      IN      NS      ns.expedition.gustave33.com.
 
 ; Glue record (karena ns masih satu domain)
-ns.expedition   IN      A       192.168.3.2
+ns.expedition   IN      A       192.168.3.3
 
-; ===== Subdomain alias (CNAME) =====
-@ 		IN 		A 		192.168.2.4
 
 
 nano /etc/bind/jarkom/2.168.192.in-addr.arpa
@@ -266,25 +262,6 @@ $TTL    604800
 
 ; ===== PTR Record (Reverse DNS) =====
 4       IN      PTR     gustave33.com.    
-
-nano /etc/bind/jarkom/expedition.gustave33.com
-$TTL    604800
-@       IN      SOA     ns.expedition.gustave33.com. root.expedition.gustave33.com. (
-                        2026010201 ; Serial
-                        604800
-                        86400
-                        2419200
-                        604800 )
-
-; ===== Name Server =====
-@       IN      NS      ns.expedition.gustave33.com.
-
-; DNS Verso
-ns      IN      A       192.168.3.2
-
-; ===== A Record tujuan =====
-@       IN      A       192.168.2.4
-
 
 
 service bind9 restart
@@ -319,3 +296,77 @@ zone "gustave33.com" {
     masters { 192.168.3.2; }; 
 	file "/etc/bind/jarkom/gustave33.com";
 };
+
+zone "expedition.gustave33.com" {
+    type master;
+    file "/etc/bind/jarkom/expedition.gustave33.com";
+};
+
+
+nano /etc/bind/jarkom/expedition.gustave33.com
+$TTL    604800
+@       IN      SOA     ns.expedition.gustave33.com. root.expedition.gustave33.com. (
+                        2026010202 ; Serial
+                        604800
+                        86400
+                        2419200
+                        604800 )
+
+; ===== Name Server =====
+@       IN      NS      ns.expedition.gustave33.com.
+
+; DNS Verso
+ns      IN      A       192.168.3.3
+
+; ===== A Record tujuan =====
+@       IN      A       192.168.2.4
+
+---------------------------------------------------------------
+---------------------------------------------------------------
+
+mkdir /var/www/jarkom
+cd /var/www/jarkom
+
+[Sciel]
+nano profile_sciel.html
+
+[Gustave]
+nano profile_gustave.html
+
+[Lune]
+nano profile_lune.html
+
+
+cd /etc/nginx/sites-available
+nano jarkom
+
+server {
+
+	listen 80;
+
+	root /var/www/jarkom;
+
+	index index.html index.htm;
+	server_name _;
+
+	location / {
+			try_files $uri $uri/ /index.php?$query_string;
+	}
+
+	# pass PHP scripts to FastCGI server
+	location ~ \.php$ {
+	include snippets/fastcgi-php.conf;
+	fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+	}
+
+location ~ /\.ht {
+			deny all;
+	}
+
+	error_log /tmp/error.log;
+	access_log /tmp/access.log;
+}
+
+ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled
+rm -f /etc/nginx/sites-enabled/default
+service nginx restart
